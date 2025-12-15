@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Pattern Ready Checklist Form</title>
+    <title>Universal Pattern Development Request Form</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
+        /* Reset and base styles */
         * {
             margin: 0;
             padding: 0;
@@ -15,183 +15,257 @@
         }
         
         body {
-            background-color: #f8f9fa;
+            background-color: #f5f7fa;
             color: #333;
-            line-height: 1.6;
-            padding: 20px;
+            line-height: 1.5;
+            min-height: 100vh;
+            padding: 0;
         }
         
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
+        /* App container - expand to maximum width with no padding */
+        .app-container {
+            width: 100vw;
+            max-width: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
         
+        /* Enhanced Header styling */
         .header {
             background: linear-gradient(135deg, #2c3e50 0%, #4a6491 100%);
             color: white;
-            padding: 30px;
+            padding: 20px;
             text-align: center;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
+            font-size: 1.8rem;
             font-weight: 700;
-        }
-        
-        .header .subtitle {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            max-width: 800px;
-            margin: 0 auto;
-            line-height: 1.6;
-        }
-        
-        .instructions {
-            background-color: #e8f4fc;
-            padding: 20px 30px;
-            border-bottom: 2px solid #d1e7ff;
-            color: #2c3e50;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        .instructions i {
-            color: #3498db;
-            margin-right: 10px;
-        }
-        
-        /* Progress Bar */
-        .progress-container {
-            padding: 20px 30px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e0e0e0;
-        }
-        
-        .progress-bar {
-            display: flex;
-            justify-content: space-between;
+            margin-bottom: 15px;
             position: relative;
-            margin-bottom: 30px;
+            z-index: 2;
         }
         
-        .progress-bar::before {
-            content: '';
+        /* Enhanced Progress Design - Single clean progress indicator */
+        .progress-container {
+            position: relative;
+            width: 90%;
+            max-width: 800px;
+            margin: 0 auto 10px;
+            height: 70px;
+        }
+        
+        .progress-line {
             position: absolute;
-            top: 50%;
+            top: 35px;
             left: 0;
             right: 0;
             height: 4px;
-            background-color: #e0e0e0;
-            transform: translateY(-50%);
+            background-color: rgba(255, 255, 255, 0.2);
             z-index: 1;
+            border-radius: 2px;
+        }
+        
+        .progress-fill {
+            position: absolute;
+            top: 35px;
+            left: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3498db 0%, #2980b9 100%);
+            z-index: 2;
+            transition: width 0.5s ease;
+            border-radius: 2px;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 3;
         }
         
         .progress-step {
-            position: relative;
-            z-index: 2;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 20%;
+            width: 90px;
+            cursor: pointer;
         }
         
-        .step-circle {
-            width: 40px;
-            height: 40px;
+        .progress-step-circle {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            background-color: #e0e0e0;
-            color: #999;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
+            font-size: 0.8rem;
             margin-bottom: 8px;
-            border: 3px solid white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
             transition: all 0.3s ease;
         }
         
-        .step-circle.active {
+        .progress-step-circle.completed {
             background-color: #3498db;
-            color: white;
-            box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
         }
         
-        .step-circle.completed {
-            background-color: #27ae60;
-            color: white;
+        .progress-step-circle.active {
+            background-color: #2980b9;
+            border-color: #2980b9;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.5);
+            transform: scale(1.1);
         }
         
-        .step-label {
-            font-size: 0.9rem;
-            color: #666;
+        .progress-step-label {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
             text-align: center;
+            line-height: 1.2;
+            max-width: 80px;
             font-weight: 500;
+            transition: all 0.3s ease;
         }
         
-        .step-label.active {
-            color: #3498db;
+        .progress-step-label.active {
+            color: white;
             font-weight: 600;
+            transform: translateY(2px);
+        }
+        
+        .progress-step-label.completed {
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .progress-text {
-            text-align: center;
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 1.1rem;
+            position: relative;
+            z-index: 2;
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
+            font-weight: 500;
         }
         
-        /* Form Sections */
-        .form-container {
-            padding: 30px;
-            min-height: 500px;
+        /* Main content area */
+        .main-content {
+            display: flex;
+            flex: 1;
+            min-height: 0;
+            height: calc(100vh - 180px);
         }
         
+        @media (max-width: 1024px) {
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+        }
+        
+        /* Enhanced Form section - cleaner design */
         .form-section {
+            flex: 1;
+            background: white;
+            padding: 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            overflow-y: auto;
+            position: relative;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Form content container - ensures consistent height across sections */
+        .form-section-content {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
             display: none;
+            background: #fff;
+        }
+        
+        .form-section-content.active {
+            display: block;
             animation: fadeIn 0.5s ease;
         }
         
-        .form-section.active {
-            display: block;
-        }
-        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0.7; }
+            to { opacity: 1; }
         }
         
+        /* Enhanced Preview section */
+        .preview-section {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            display: flex;
+            flex-direction: column;
+            min-height: 600px;
+            border-left: 1px solid #eaeaea;
+        }
+        
+        @media (max-width: 1024px) {
+            .form-section, .preview-section {
+                min-height: 500px;
+            }
+            
+            .preview-section {
+                border-left: none;
+                border-top: 1px solid #eaeaea;
+            }
+        }
+        
+        .preview-container {
+            flex: 1;
+            overflow-y: auto;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f9f9f9;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        /* Section title styling - cleaner design */
         .section-title {
             color: #2c3e50;
-            font-size: 1.8rem;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
+            font-size: 1.5rem;
+            margin: 0 0 25px 0;
+            padding-bottom: 12px;
             border-bottom: 2px solid #ecf0f1;
             display: flex;
             align-items: center;
         }
         
-        .section-title .number {
+        .section-title .icon {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             background-color: #3498db;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             margin-right: 15px;
             font-weight: bold;
             font-size: 1.2rem;
+            box-shadow: 0 3px 6px rgba(52, 152, 219, 0.3);
         }
         
+        /* Enhanced Form elements */
         .form-group {
             margin-bottom: 25px;
+            position: relative;
         }
         
         .form-group label {
@@ -199,29 +273,30 @@
             font-weight: 600;
             margin-bottom: 8px;
             color: #2c3e50;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
         
         .form-group .hint {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #7f8c8d;
             margin-bottom: 8px;
             font-style: italic;
+            display: block;
         }
         
         .form-group input[type="text"],
         .form-group input[type="number"],
         .form-group input[type="email"],
-        .form-group input[type="url"],
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 14px 15px;
+            padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
             background-color: #f9f9f9;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         
         .form-group input:focus,
@@ -234,7 +309,7 @@
         }
         
         .form-group textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
             font-family: inherit;
         }
@@ -247,7 +322,7 @@
         
         .inline-field {
             flex: 1;
-            min-width: 200px;
+            min-width: 150px;
         }
         
         .checkbox-group, .radio-group {
@@ -267,26 +342,36 @@
         .checkbox-item input[type="checkbox"],
         .radio-item input[type="radio"] {
             margin-right: 10px;
-            transform: scale(1.2);
+            width: 18px;
+            height: 18px;
+        }
+        
+        .checkbox-item label,
+        .radio-item label {
+            margin-bottom: 0;
+            font-weight: 500;
+            cursor: pointer;
         }
         
         .upload-area {
             border: 2px dashed #bdc3c7;
             border-radius: 8px;
-            padding: 30px 20px;
+            padding: 25px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             background-color: #f9f9f9;
+            margin-bottom: 15px;
         }
         
         .upload-area:hover {
             border-color: #3498db;
             background-color: #e8f4fc;
+            transform: translateY(-2px);
         }
         
         .upload-area i {
-            font-size: 2.5rem;
+            font-size: 2rem;
             color: #7f8c8d;
             margin-bottom: 15px;
         }
@@ -294,6 +379,7 @@
         .upload-area p {
             margin-bottom: 10px;
             color: #555;
+            font-size: 0.95rem;
         }
         
         .upload-area .browse {
@@ -307,7 +393,7 @@
         }
         
         .file-list {
-            margin-top: 15px;
+            margin-top: 10px;
             list-style-type: none;
         }
         
@@ -319,61 +405,55 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: background-color 0.3s;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
         
         .file-list li:hover {
-            background-color: #d5dbdb;
+            background-color: #dfe6e9;
+            transform: translateX(5px);
         }
         
         .file-list li i {
             color: #e74c3c;
             cursor: pointer;
-            transition: color 0.3s;
+            padding: 5px;
+            border-radius: 3px;
         }
         
         .file-list li i:hover {
-            color: #c0392b;
+            background-color: #e74c3c;
+            color: white;
         }
         
-        .measurement-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-            gap: 20px;
+        .required::after {
+            content: " *";
+            color: #e74c3c;
         }
         
-        .measurement-item {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .measurement-item label {
-            font-size: 0.95rem;
-            margin-bottom: 5px;
-            color: #34495e;
-        }
-        
-        /* Navigation Buttons */
-        .navigation-buttons {
+        /* Enhanced Action buttons */
+        .action-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 40px;
-            padding-top: 30px;
+            margin-top: 30px;
+            padding-top: 25px;
             border-top: 1px solid #ecf0f1;
+            gap: 15px;
         }
         
         .btn {
-            padding: 14px 30px;
-            border-radius: 8px;
-            font-size: 1rem;
+            padding: 14px 24px;
+            border-radius: 6px;
+            font-size: 0.95rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             border: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            min-width: 150px;
+            min-width: 140px;
+            box-shadow: 0 3px 6px rgba(0,0,0,0.1);
         }
         
         .btn i {
@@ -387,8 +467,8 @@
         
         .btn-primary:hover {
             background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
         }
         
         .btn-secondary {
@@ -398,76 +478,31 @@
         
         .btn-secondary:hover {
             background-color: #7f8c8d;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(149, 165, 166, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(149, 165, 166, 0.3);
         }
         
         .btn-success {
-            background-color: #27ae60;
+            background-color: #2ecc71;
             color: white;
         }
         
         .btn-success:hover {
-            background-color: #219653;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+            background-color: #27ae60;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(46, 204, 113, 0.3);
         }
         
-        .btn:disabled {
-            background-color: #bdc3c7;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .checklist-section {
-            background-color: #f8f9fa;
-            border-left: 5px solid #27ae60;
-            padding: 25px;
-            border-radius: 8px;
-            margin-top: 40px;
-        }
-        
-        .checklist-title {
-            color: #27ae60;
-            font-size: 1.6rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-        }
-        
-        .checklist-title i {
-            margin-right: 10px;
-        }
-        
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            padding: 12px 15px;
-            background-color: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        }
-        
-        .checklist-item input[type="checkbox"] {
-            margin-right: 15px;
-            transform: scale(1.3);
-        }
-        
-        .checklist-item label {
-            font-weight: 500;
-            color: #2c3e50;
-            font-size: 1.05rem;
-            cursor: pointer;
-        }
-        
+        /* Footer */
         .footer {
             text-align: center;
-            padding: 25px;
+            padding: 20px;
             color: #7f8c8d;
             border-top: 1px solid #ecf0f1;
             background-color: #f8f9fa;
+            margin-top: 10px;
+            flex-shrink: 0;
+            font-size: 0.9rem;
         }
         
         .footer a {
@@ -480,37 +515,28 @@
             text-decoration: underline;
         }
         
-        .required::after {
-            content: " *";
-            color: #e74c3c;
-        }
-        
-        /* Dynamic form element styling */
-        .dynamic-option {
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .dynamic-option.active {
-            display: block;
-        }
-        
+        /* Mobile Optimizations */
         @media (max-width: 768px) {
+            .app-container {
+                height: auto;
+                min-height: 100vh;
+            }
+            
+            .main-content {
+                flex-direction: column;
+                height: auto;
+            }
+            
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.5rem;
             }
             
             .checkbox-item, .radio-item {
                 width: 100%;
             }
             
-            .measurement-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .navigation-buttons {
+            .action-buttons {
                 flex-direction: column;
-                gap: 15px;
             }
             
             .btn {
@@ -519,643 +545,985 @@
             
             .inline-fields {
                 flex-direction: column;
+                gap: 15px;
             }
             
-            .inline-field {
-                width: 100%;
+            .preview-container {
+                min-height: 300px;
             }
             
-            .progress-step {
-                width: 16.66%;
+            .form-section, .preview-section {
+                min-height: 500px;
             }
             
-            .step-label {
-                font-size: 0.8rem;
+            .progress-container {
+                height: 60px;
             }
+            
+            .progress-line, .progress-fill {
+                top: 30px;
+            }
+            
+            .progress-step-circle {
+                width: 28px;
+                height: 28px;
+                font-size: 0.7rem;
+            }
+            
+            .progress-step-label {
+                font-size: 0.65rem;
+                max-width: 70px;
+            }
+            
+            .form-section-content {
+                padding: 20px;
+            }
+        }
+        
+        /* Keyboard Navigation */
+        input:focus, 
+        select:focus, 
+        textarea:focus, 
+        button:focus {
+            outline: 2px solid #3498db;
+            outline-offset: 2px;
+        }
+        
+        /* Enhanced Preview Styling */
+        .preview-title {
+            color: #2c3e50;
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+        
+        .preview-content {
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .preview-section h3 {
+            color: #2c3e50;
+            background-color: #ecf0f1;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin: 20px 0 15px 0;
+            font-size: 1rem;
+            border-left: 4px solid #3498db;
+        }
+        
+        .preview-section p {
+            margin-bottom: 10px;
+            padding: 0 5px;
+        }
+        
+        .preview-section strong {
+            color: #2c3e50;
+            min-width: 180px;
+            display: inline-block;
+        }
+        
+        .preview-update {
+            text-align: center;
+            padding: 12px;
+            background: #e8f4fc;
+            border-radius: 6px;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #3498db;
+            border-left: 4px solid #3498db;
+        }
+        
+        /* Form specific styles */
+        .instructions {
+            background-color: #e8f4fc;
+            border-left: 4px solid #3498db;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        
+        .measurement-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .measurement-item {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .measurement-item label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .measurement-item input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        
+        .stretch-direction {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stretch-option {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .stretch-option input {
+            margin-right: 8px;
+        }
+        
+        .stretch-option label {
+            margin-bottom: 0;
+        }
+        
+        .notching-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+        
+        .notching-option {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+            transition: all 0.2s ease;
+        }
+        
+        .notching-option:hover {
+            background-color: #e8f4fc;
+            border-color: #3498db;
+        }
+        
+        .notching-option input {
+            margin-right: 10px;
+        }
+        
+        /* Enhanced Checklist styling */
+        .checklist {
+            margin-top: 25px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .checklist h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px 0;
+            border-bottom: 1px dashed #e0e0e0;
+        }
+        
+        .checklist-item:last-child {
+            border-bottom: none;
+        }
+        
+        .checklist-item input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .checklist-item label {
+            font-weight: normal;
+            cursor: pointer;
+        }
+        
+        .checklist-item input:checked + label {
+            color: #27ae60;
+            font-weight: 600;
+        }
+        
+        /* Animation for progress */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-pulse {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Custom scrollbar */
+        .form-section::-webkit-scrollbar,
+        .preview-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .form-section::-webkit-scrollbar-track,
+        .preview-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .form-section::-webkit-scrollbar-thumb,
+        .preview-container::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 4px;
+        }
+        
+        .form-section::-webkit-scrollbar-thumb:hover,
+        .preview-container::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Section-specific icons */
+        .section-icon {
+            margin-right: 12px;
+            color: #3498db;
+            font-size: 1.2rem;
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app-container">
         <div class="header">
-            <h1>Interactive Pattern Ready Checklist</h1>
-            <p class="subtitle">Complete this multi-section form to submit your pattern request. Navigate through each section using the progress bar below.</p>
+            <h1>Universal Pattern Development Request Form</h1>
+            
+            <!-- Clean Progress Design - Single row only -->
+            <div class="progress-container">
+                <div class="progress-line"></div>
+                <div class="progress-fill" id="progressFill"></div>
+                
+                <div class="progress-steps">
+                    <div class="progress-step" data-step="0">
+                        <div class="progress-step-circle active" id="progressStep1">
+                            <i class="fas fa-pencil-ruler"></i>
+                        </div>
+                        <div class="progress-step-label active">Design</div>
+                    </div>
+                    <div class="progress-step" data-step="1">
+                        <div class="progress-step-circle" id="progressStep2">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="progress-step-label">Fabric</div>
+                    </div>
+                    <div class="progress-step" data-step="2">
+                        <div class="progress-step-circle" id="progressStep3">
+                            <i class="fas fa-ruler-combined"></i>
+                        </div>
+                        <div class="progress-step-label">Sizing</div>
+                    </div>
+                    <div class="progress-step" data-step="3">
+                        <div class="progress-step-circle" id="progressStep4">
+                            <i class="fas fa-cut"></i>
+                        </div>
+                        <div class="progress-step-label">Construction</div>
+                    </div>
+                    <div class="progress-step" data-step="4">
+                        <div class="progress-step-circle" id="progressStep5">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <div class="progress-step-label">Technical</div>
+                    </div>
+                    <div class="progress-step" data-step="5">
+                        <div class="progress-step-circle" id="progressStep6">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <div class="progress-step-label">Review</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="progress-text">Step <span id="progressStep">1</span> of 6: <span id="progressStepName">Design Overview</span></div>
         </div>
         
-        <div class="instructions">
-            <p><i class="fas fa-info-circle"></i> <strong>Instructions:</strong> Please complete each section with details specific to your design. Use the navigation buttons to move between sections.</p>
-        </div>
-        
-        <!-- Progress Bar -->
-        <div class="progress-container">
-            <div class="progress-text" id="progressText">Step 1 of 6: Design Overview</div>
-            <div class="progress-bar">
-                <div class="progress-step">
-                    <div class="step-circle active" id="step1">1</div>
-                    <div class="step-label active">Design</div>
+        <div class="main-content">
+            <div class="form-section">
+                <!-- Section 1: Design Overview -->
+                <div class="form-section-content active" id="section1">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-pencil-ruler"></i></span>
+                        Design Overview
+                    </h2>
+                    
+                    <div class="instructions">
+                        Please complete each section with details specific to your design. This information will allow a pattern maker to draft or digitize your pattern accurately.
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="garmentType" class="required">Garment Type</label>
+                        <select id="garmentType" name="garmentType" required aria-required="true">
+                            <option value="">Select garment type</option>
+                            <option value="dress">Dress</option>
+                            <option value="blouse">Blouse/Shirt</option>
+                            <option value="skirt">Skirt</option>
+                            <option value="pants">Pants/Trousers</option>
+                            <option value="jacket">Jacket/Blazer</option>
+                            <option value="leggings">Leggings</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="silhouetteFit" class="required">Silhouette & Fit</label>
+                        <textarea id="silhouetteFit" name="silhouetteFit" 
+                                  placeholder="e.g., fitted through bodice, relaxed through hip, high-waisted" 
+                                  required aria-required="true"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="referenceImages">Reference Images/Sketches</label>
+                        <div class="hint">Attach clear front, back, and side views</div>
+                        <div class="upload-area" id="referenceUploadArea" tabindex="0" role="button" 
+                             aria-label="Upload reference images">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>Drag & drop or <span class="browse">click to browse</span></p>
+                            <p>Front, back, side views (JPG, PNG, PDF)</p>
+                            <input type="file" id="referenceImages" class="file-input" accept=".jpg,.jpeg,.png,.pdf" multiple>
+                        </div>
+                        <ul class="file-list" id="referenceFileList"></ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="designDetails" class="required">Design Details</label>
+                        <div class="hint">Describe or label on sketch: darts, pleats, gathers, seams, closures, topstitching, etc.</div>
+                        <textarea id="designDetails" name="designDetails" 
+                                  placeholder="Describe your design details..." 
+                                  required aria-required="true"></textarea>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="clearForm" aria-label="Clear all form fields">
+                            <i class="fas fa-redo"></i> Clear All
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next1" aria-label="Go to next section">
+                            Next: Fabric Information <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="step2">2</div>
-                    <div class="step-label">Fabric</div>
+                
+                <!-- Section 2: Fabric Information -->
+                <div class="form-section-content" id="section2">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-tshirt"></i></span>
+                        Fabric Information
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="fabricType" class="required">Fabric Type</label>
+                        <input type="text" id="fabricType" name="fabricType" 
+                               placeholder="e.g., woven cotton, 4-way stretch knit, denim" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fabricWeight" class="required">Weight & Hand Feel</label>
+                        <input type="text" id="fabricWeight" name="fabricWeight" 
+                               placeholder="e.g., lightweight and drapey, medium-weight and structured" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="inline-fields">
+                        <div class="inline-field">
+                            <label for="stretchPercentage">Stretch Percentage</label>
+                            <input type="number" id="stretchPercentage" name="stretchPercentage" 
+                                   min="0" max="100" placeholder="e.g., 20">
+                        </div>
+                        <div class="inline-field">
+                            <label>Stretch Direction</label>
+                            <div class="stretch-direction">
+                                <div class="stretch-option">
+                                    <input type="checkbox" id="stretchLengthwise" name="stretchDirection" value="Lengthwise">
+                                    <label for="stretchLengthwise">Lengthwise</label>
+                                </div>
+                                <div class="stretch-option">
+                                    <input type="checkbox" id="stretchCrosswise" name="stretchDirection" value="Crosswise">
+                                    <label for="stretchCrosswise">Crosswise</label>
+                                </div>
+                                <div class="stretch-option">
+                                    <input type="checkbox" id="stretchBoth" name="stretchDirection" value="Both/4-way">
+                                    <label for="stretchBoth">Both/4-way</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fabricNotes">Special Notes</label>
+                        <textarea id="fabricNotes" name="fabricNotes" 
+                                  placeholder="e.g., requires pre-washing, has nap/directional print, slippery"></textarea>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="prev2" aria-label="Go to previous section">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next2" aria-label="Go to next section">
+                            Next: Sizing & Measurements <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="step3">3</div>
-                    <div class="step-label">Sizing</div>
+                
+                <!-- Section 3: Sizing & Measurements -->
+                <div class="form-section-content" id="section3">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-ruler-combined"></i></span>
+                        Sizing & Measurements
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="baseSize" class="required">Base Size</label>
+                        <input type="text" id="baseSize" name="baseSize" 
+                               placeholder="e.g., Women's US 8, Men's Medium" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Garment Measurements Provided</label>
+                        <div class="measurement-row">
+                            <div class="measurement-item">
+                                <label for="bustMeasure">Bust</label>
+                                <input type="text" id="bustMeasure" name="bustMeasure" placeholder="inches/cm">
+                            </div>
+                            <div class="measurement-item">
+                                <label for="waistMeasure">Waist</label>
+                                <input type="text" id="waistMeasure" name="waistMeasure" placeholder="inches/cm">
+                            </div>
+                            <div class="measurement-item">
+                                <label for="hipMeasure">Hip</label>
+                                <input type="text" id="hipMeasure" name="hipMeasure" placeholder="inches/cm">
+                            </div>
+                        </div>
+                        <div class="measurement-row">
+                            <div class="measurement-item">
+                                <label for="lengthMeasure">Length</label>
+                                <input type="text" id="lengthMeasure" name="lengthMeasure" placeholder="inches/cm">
+                            </div>
+                            <div class="measurement-item">
+                                <label for="sleeveMeasure">Sleeve</label>
+                                <input type="text" id="sleeveMeasure" name="sleeveMeasure" placeholder="inches/cm">
+                            </div>
+                            <div class="measurement-item">
+                                <label for="otherMeasure">Other</label>
+                                <input type="text" id="otherMeasure" name="otherMeasure" placeholder="inches/cm">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="inline-fields">
+                        <div class="inline-field">
+                            <label for="easeWovens">Ease for Wovens</label>
+                            <input type="text" id="easeWovens" name="easeWovens" 
+                                   placeholder="e.g., 2&quot; ease at bust, 1.5&quot; at waist">
+                        </div>
+                        <div class="inline-field">
+                            <label for="easeKnits">Ease for Knits</label>
+                            <input type="text" id="easeKnits" name="easeKnits" 
+                                   placeholder="e.g., 0&quot; ease at bust [negative ease], 1&quot; ease at hip">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Size Grading Needed?</label>
+                        <div class="radio-group">
+                            <div class="radio-item">
+                                <input type="radio" id="gradingYes" name="sizeGrading" value="yes">
+                                <label for="gradingYes">Yes – attach size chart</label>
+                            </div>
+                            <div class="radio-item">
+                                <input type="radio" id="gradingNo" name="sizeGrading" value="no">
+                                <label for="gradingNo">No – single size only</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="sizeChart">Size Chart Upload (if applicable)</label>
+                        <div class="upload-area" id="sizeChartUploadArea" tabindex="0" role="button" 
+                             aria-label="Upload size chart">
+                            <i class="fas fa-file-upload"></i>
+                            <p>Drag & drop or <span class="browse">click to browse</span></p>
+                            <p>Size chart file (PDF, Excel, Image)</p>
+                            <input type="file" id="sizeChart" class="file-input" accept=".jpg,.jpeg,.png,.pdf,.xlsx,.xls">
+                        </div>
+                        <ul class="file-list" id="sizeChartFileList"></ul>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="prev3" aria-label="Go to previous section">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next3" aria-label="Go to next section">
+                            Next: Construction Details <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="step4">4</div>
-                    <div class="step-label">Construction</div>
+                
+                <!-- Section 4: Construction Details -->
+                <div class="form-section-content" id="section4">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-cut"></i></span>
+                        Construction Details
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="seamAllowance" class="required">Seam Allowance</label>
+                        <input type="text" id="seamAllowance" name="seamAllowance" 
+                               placeholder="e.g., Standard ⅝&quot; overall, ¼&quot; for collars" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hemStyle" class="required">Hem Style & Width</label>
+                        <input type="text" id="hemStyle" name="hemStyle" 
+                               placeholder="e.g., 1.5&quot; double-fold hem, faced hem, raw edge with binding" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="closures" class="required">Closures</label>
+                        <textarea id="closures" name="closures" 
+                                  placeholder="Type, size, placement: e.g., 14&quot; invisible zipper at center back, button placket with 1&quot; buttons" 
+                                  required aria-required="true"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="liningFacing" class="required">Lining/Facing/Interfacing</label>
+                        <textarea id="liningFacing" name="liningFacing" 
+                                  placeholder="Indicate areas if needed: e.g., full lining, front facing only, interfacing at collar" 
+                                  required aria-required="true"></textarea>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="prev4" aria-label="Go to previous section">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next4" aria-label="Go to next section">
+                            Next: Technical Requirements <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="step5">5</div>
-                    <div class="step-label">Technical</div>
+                
+                <!-- Section 5: Technical Requirements -->
+                <div class="form-section-content" id="section5">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-cogs"></i></span>
+                        Technical Requirements
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="grainlineDirection">Grainline Direction</label>
+                        <textarea id="grainlineDirection" name="grainlineDirection" 
+                                  placeholder="Indicate on sketch, especially for stripes/plaids/napped fabrics"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Notching System</label>
+                        <div class="notching-options">
+                            <div class="notching-option">
+                                <input type="radio" id="notchSlit" name="notchingSystem" value="Slit Notch">
+                                <label for="notchSlit">Slit Notch (single cut)</label>
+                            </div>
+                            <div class="notching-option">
+                                <input type="radio" id="notchV" name="notchingSystem" value="V Notch">
+                                <label for="notchV">V Notch (triangular cut outward)</label>
+                            </div>
+                            <div class="notching-option">
+                                <input type="radio" id="notchCastle" name="notchingSystem" value="Castle Notch">
+                                <label for="notchCastle">Castle Notch (U-shaped/rectangular)</label>
+                            </div>
+                            <div class="notching-option">
+                                <input type="radio" id="notchInverted" name="notchingSystem" value="Inverted V Notch">
+                                <label for="notchInverted">Inverted V Notch (triangular cut inward)</label>
+                            </div>
+                            <div class="notching-option">
+                                <input type="radio" id="notchCustom" name="notchingSystem" value="Custom">
+                                <label for="notchCustom">Custom</label>
+                            </div>
+                            <div class="notching-option">
+                                <input type="radio" id="notchStandard" name="notchingSystem" value="Standard">
+                                <label for="notchStandard">No preference – pattern maker's standard</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="customNotching">Custom Notching Description (if selected)</label>
+                        <input type="text" id="customNotching" name="customNotching" 
+                               placeholder="Describe custom notching system">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="patternLabels">Pattern Labels Required</label>
+                        <textarea id="patternLabels" name="patternLabels" 
+                                  placeholder="e.g., piece name, size, cut quantity, fabric type"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Final File Format Needed</label>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="formatPDF" name="fileFormat" value="PDF">
+                                <label for="formatPDF">.PDF (for printing)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="formatDXF" name="fileFormat" value="DXF">
+                                <label for="formatDXF">.DXF (for digital cutting)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="formatAI" name="fileFormat" value="AI">
+                                <label for="formatAI">.AI (Adobe Illustrator)</label>
+                            </div>
+                            <div class="checkbox-item">
+                                <input type="checkbox" id="formatOther" name="fileFormat" value="Other">
+                                <label for="formatOther">Other format</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="otherFormat">Other Format (specify)</label>
+                        <input type="text" id="otherFormat" name="otherFormat" 
+                               placeholder="e.g., .SVG, .PAT">
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="prev5" aria-label="Go to previous section">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-primary" id="next5" aria-label="Go to next section">
+                            Next: Special Notes & Review <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
-                <div class="progress-step">
-                    <div class="step-circle" id="step6">6</div>
-                    <div class="step-label">Final</div>
+                
+                <!-- Section 6: Special Notes & Fit Considerations -->
+                <div class="form-section-content" id="section6">
+                    <h2 class="section-title">
+                        <span class="icon"><i class="fas fa-clipboard-check"></i></span>
+                        Special Notes & Review
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label for="targetCustomer">Target Customer/Body Type</label>
+                        <textarea id="targetCustomer" name="targetCustomer" 
+                                  placeholder="e.g., petite, tall, athletic build, full bust"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fitAdjustments">Common Fit Adjustments</label>
+                        <textarea id="fitAdjustments" name="fitAdjustments" 
+                                  placeholder="e.g., rounded back adjustment, forward shoulder"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="otherNotes">Other Notes</label>
+                        <textarea id="otherNotes" name="otherNotes" 
+                                  placeholder="Any critical tolerances, branding labels, or construction preferences"></textarea>
+                    </div>
+                    
+                    <div class="checklist">
+                        <h3>Final Submission Checklist</h3>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check1" name="checklist">
+                            <label for="check1">All sketches/images attached and labeled</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check2" name="checklist">
+                            <label for="check2">All measurements and sizing details provided</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check3" name="checklist">
+                            <label for="check3">Fabric information and stretch details confirmed</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check4" name="checklist">
+                            <label for="check4">Construction and finishing details specified</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check5" name="checklist">
+                            <label for="check5">Preferred output format selected</label>
+                        </div>
+                        <div class="checklist-item">
+                            <input type="checkbox" id="check6" name="checklist">
+                            <label for="check6">Contact information and timeline included</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contactInfo" class="required">Contact Information</label>
+                        <textarea id="contactInfo" name="contactInfo" 
+                                  placeholder="Name, email, phone, company (if applicable)" 
+                                  required aria-required="true"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="timeline" class="required">Project Timeline</label>
+                        <input type="text" id="timeline" name="timeline" 
+                               placeholder="e.g., Within 2 weeks, Urgent, No rush" 
+                               required aria-required="true">
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button type="button" class="btn btn-secondary" id="prev6" aria-label="Go to previous section">
+                            <i class="fas fa-arrow-left"></i> Previous
+                        </button>
+                        <button type="button" class="btn btn-success" id="submitForm" aria-label="Submit pattern request">
+                            <i class="fas fa-paper-plane"></i> Submit Request
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="preview-section">
+                <h2 class="preview-title">Form Preview</h2>
+                <div class="preview-container" id="previewContainer">
+                    <div class="preview-content" id="previewContent">
+                        <h3>Universal Pattern Development Request Form</h3>
+                        <p><strong>Current Step:</strong> <span id="previewStep">Design Overview</span></p>
+                        <p><strong>Progress:</strong> <span id="previewProgress">1 of 6</span></p>
+                        
+                        <h3>Design Overview</h3>
+                        <p><strong>Garment Type:</strong> <span id="previewGarment">Not specified</span></p>
+                        <p><strong>Silhouette & Fit:</strong> <span id="previewFit">Not specified</span></p>
+                        <p><strong>Design Details:</strong> <span id="previewDesign">Not specified</span></p>
+                        
+                        <h3>Fabric Information</h3>
+                        <p><strong>Fabric Type:</strong> <span id="previewFabric">Not specified</span></p>
+                        <p><strong>Weight & Hand Feel:</strong> <span id="previewWeight">Not specified</span></p>
+                        <p><strong>Stretch:</strong> <span id="previewStretch">Not specified</span></p>
+                        
+                        <h3>Sizing & Measurements</h3>
+                        <p><strong>Base Size:</strong> <span id="previewSize">Not specified</span></p>
+                        <p><strong>Bust:</strong> <span id="previewBust">Not specified</span></p>
+                        <p><strong>Waist:</strong> <span id="previewWaist">Not specified</span></p>
+                        
+                        <h3>Construction Details</h3>
+                        <p><strong>Seam Allowance:</strong> <span id="previewSeam">Not specified</span></p>
+                        <p><strong>Hem Style:</strong> <span id="previewHem">Not specified</span></p>
+                        
+                        <h3>Technical Requirements</h3>
+                        <p><strong>File Formats:</strong> <span id="previewFormats">Not specified</span></p>
+                        <p><strong>Notching System:</strong> <span id="previewNotching">Not specified</span></p>
+                        
+                        <h3>Special Notes</h3>
+                        <p><strong>Target Customer:</strong> <span id="previewTarget">Not specified</span></p>
+                        <p><strong>Fit Adjustments:</strong> <span id="previewAdjustments">Not specified</span></p>
+                        
+                        <div class="preview-update">
+                            <i class="fas fa-sync-alt"></i> Preview updates as you complete the form
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="margin-top: 15px; border-top: none;">
+                    <button type="button" class="btn btn-primary" id="updatePreview" aria-label="Refresh preview">
+                        <i class="fas fa-sync"></i> Refresh Preview
+                    </button>
+                    <button type="button" class="btn btn-success" id="downloadPDF" aria-label="Download PDF version">
+                        <i class="fas fa-file-pdf"></i> Download PDF
+                    </button>
                 </div>
             </div>
         </div>
         
-        <!-- Form Container -->
-        <form id="patternRequestForm" class="form-container">
-            <!-- Section 1: Design Overview -->
-            <section class="form-section active" id="section1">
-                <h2 class="section-title"><span class="number">1</span> Design Overview</h2>
-                
-                <div class="form-group">
-                    <label for="garmentType" class="required">Garment Type</label>
-                    <div class="hint">Select the primary garment type or enter a custom type</div>
-                    <select id="garmentType" name="garmentType" required>
-                        <option value="">-- Select Garment Type --</option>
-                        <option value="dress">Dress</option>
-                        <option value="blouse">Blouse/Shirt</option>
-                        <option value="skirt">Skirt</option>
-                        <option value="pants">Pants/Trousers</option>
-                        <option value="jacket">Jacket/Blazer</option>
-                        <option value="coat">Coat</option>
-                        <option value="leggings">Leggings</option>
-                        <option value="shorts">Shorts</option>
-                        <option value="jumpsuit">Jumpsuit/Romper</option>
-                        <option value="vest">Vest</option>
-                        <option value="other">Other (specify below)</option>
-                    </select>
-                    <div id="customGarmentContainer" class="dynamic-option">
-                        <input type="text" id="customGarmentType" name="customGarmentType" placeholder="Please specify your garment type">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="silhouetteFit" class="required">Silhouette & Fit Description</label>
-                    <div class="hint">Describe the overall silhouette and how the garment should fit</div>
-                    <textarea id="silhouetteFit" name="silhouetteFit" placeholder="e.g., fitted through bodice, relaxed through hip, high-waisted, A-line skirt, oversized sleeves..." required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="referenceImages" class="required">Reference Images/Sketches</label>
-                    <div class="hint">Attach clear front, back, and side views of your design</div>
-                    <div class="upload-area" id="referenceUploadArea">
-                        <i class="fas fa-images"></i>
-                        <p>Drag & drop or <span class="browse">click to browse</span> your design images</p>
-                        <p>Accepted formats: JPG, PNG, PDF, AI (Max size: 10MB each)</p>
-                        <input type="file" id="referenceImages" class="file-input" accept=".jpg,.jpeg,.png,.pdf,.ai" multiple>
-                    </div>
-                    <ul class="file-list" id="referenceFileList"></ul>
-                </div>
-                
-                <div class="form-group">
-                    <label for="designDetails" class="required">Design Details</label>
-                    <div class="hint">Describe or list key design elements that should be included in the pattern</div>
-                    <textarea id="designDetails" name="designDetails" placeholder="Describe or label on sketch: darts, pleats, gathers, seams, closures, topstitching, pockets, collars, sleeves, etc." required></textarea>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="clearForm">
-                        <i class="fas fa-redo"></i> Clear All
-                    </button>
-                    <button type="button" class="btn btn-primary" id="next1">
-                        Next: Fabric Information <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Section 2: Fabric Information -->
-            <section class="form-section" id="section2">
-                <h2 class="section-title"><span class="number">2</span> Fabric Information</h2>
-                
-                <div class="form-group">
-                    <label for="fabricType" class="required">Fabric Type</label>
-                    <div class="hint">Primary fabric and any secondary fabrics (lining, interfacing, etc.)</div>
-                    <textarea id="fabricType" name="fabricType" placeholder="e.g., woven cotton poplin, 4-way stretch knit, medium-weight denim, silk chiffon lining..." required></textarea>
-                </div>
-                
-                <div class="inline-fields">
-                    <div class="inline-field">
-                        <label for="fabricWeight">Weight & Hand Feel</label>
-                        <div class="hint">Describe the fabric weight and how it feels/drapes</div>
-                        <input type="text" id="fabricWeight" name="fabricWeight" placeholder="e.g., lightweight and drapey, medium-weight and structured">
-                    </div>
-                    
-                    <div class="inline-field">
-                        <label for="fabricStretch">Stretch Percentage</label>
-                        <div class="hint">If fabric has stretch, indicate percentage</div>
-                        <input type="number" id="fabricStretch" name="fabricStretch" min="0" max="100" step="5" placeholder="e.g., 20%">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Stretch Direction</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="stretchLengthwise" name="stretchDirection">
-                            <label for="stretchLengthwise">Lengthwise (Warp)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="stretchCrosswise" name="stretchDirection">
-                            <label for="stretchCrosswise">Crosswise (Weft)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="stretch4way" name="stretchDirection">
-                            <label for="stretch4way">Both/4-way Stretch</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="stretchNone" name="stretchDirection">
-                            <label for="stretchNone">No Stretch (Woven)</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="fabricNotes">Special Fabric Notes</label>
-                    <div class="hint">Any special handling, preparation, or characteristics</div>
-                    <textarea id="fabricNotes" name="fabricNotes" placeholder="e.g., requires pre-washing, has nap/directional print, slippery, delicate, fraying, etc."></textarea>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="prev2">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" id="next2">
-                        Next: Sizing & Measurements <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Section 3: Sizing & Measurements -->
-            <section class="form-section" id="section3">
-                <h2 class="section-title"><span class="number">3</span> Sizing & Measurements</h2>
-                
-                <div class="form-group">
-                    <label for="baseSize" class="required">Base Size</label>
-                    <div class="hint">The sample size for pattern development</div>
-                    <input type="text" id="baseSize" name="baseSize" placeholder="e.g., Women's US 8, Men's Medium, Unisex Size M" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="garmentMeasurements" class="required">Garment Measurements Provided</label>
-                    <div class="hint">List all finished garment measurements (not body measurements)</div>
-                    <textarea id="garmentMeasurements" name="garmentMeasurements" placeholder="e.g., Bust: 40\", Waist: 32\", Hip: 42\", Length: 42\", Sleeve: 23\", Shoulder: 16\", etc." required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Ease Requirements</label>
-                    <div class="hint">Amount of ease (extra room) in the garment</div>
-                    <div class="inline-fields">
-                        <div class="inline-field">
-                            <label for="easeWovens">For Wovens</label>
-                            <input type="text" id="easeWovens" name="easeWovens" placeholder="e.g., 2\" ease at bust, 1.5\" at waist">
-                        </div>
-                        <div class="inline-field">
-                            <label for="easeKnits">For Knits</label>
-                            <input type="text" id="easeKnits" name="easeKnits" placeholder="e.g., 0\" ease at bust, 1\" ease at hip">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>Size Grading Needed?</label>
-                    <div class="radio-group">
-                        <div class="radio-item">
-                            <input type="radio" id="gradingYes" name="sizeGrading" value="yes">
-                            <label for="gradingYes">Yes – I will attach a size chart</label>
-                        </div>
-                        <div class="radio-item">
-                            <input type="radio" id="gradingNo" name="sizeGrading" value="no" checked>
-                            <label for="gradingNo">No – single size only</label>
-                        </div>
-                    </div>
-                    <div id="sizeChartContainer" class="dynamic-option">
-                        <label for="sizeChartUpload">Upload Size Chart</label>
-                        <div class="upload-area" id="sizeChartUploadArea">
-                            <i class="fas fa-table"></i>
-                            <p>Drag & drop or <span class="browse">click to browse</span> your size chart</p>
-                            <input type="file" id="sizeChartUpload" class="file-input" accept=".jpg,.jpeg,.png,.pdf,.xlsx,.xls">
-                        </div>
-                        <ul class="file-list" id="sizeChartFileList"></ul>
-                    </div>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="prev3">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" id="next3">
-                        Next: Construction Details <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Section 4: Construction Details -->
-            <section class="form-section" id="section4">
-                <h2 class="section-title"><span class="number">4</span> Construction Details</h2>
-                
-                <div class="form-group">
-                    <label for="seamAllowance" class="required">Seam Allowance</label>
-                    <div class="hint">Standard or custom seam allowance widths</div>
-                    <input type="text" id="seamAllowance" name="seamAllowance" placeholder="e.g., Standard ⅝\" overall, ¼\" for collars, 1\" for hem" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="hemStyle" class="required">Hem Style & Width</label>
-                    <div class="hint">Type of hem and finished width</div>
-                    <input type="text" id="hemStyle" name="hemStyle" placeholder="e.g., 1.5\" double-fold hem, faced hem, raw edge with binding, lettuce edge" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="closures" class="required">Closures</label>
-                    <div class="hint">Type, size, and placement of closures</div>
-                    <textarea id="closures" name="closures" placeholder="e.g., 14\" invisible zipper at center back, button placket with 1\" buttons, snap closure at waist, hook and eye at neckline" required></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="liningDetails">Lining/Facing/Interfacing Details</label>
-                    <div class="hint">Indicate areas where lining, facing, or interfacing is needed</div>
-                    <textarea id="liningDetails" name="liningDetails" placeholder="e.g., full lining, front facing only, interfacing at collar and cuffs, bias binding on armholes"></textarea>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="prev4">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" id="next4">
-                        Next: Technical Requirements <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Section 5: Technical Requirements -->
-            <section class="form-section" id="section5">
-                <h2 class="section-title"><span class="number">5</span> Technical Requirements</h2>
-                
-                <div class="form-group">
-                    <label for="grainlineDirection">Grainline Direction Notes</label>
-                    <div class="hint">Important for stripes, plaids, napped fabrics, or directional prints</div>
-                    <textarea id="grainlineDirection" name="grainlineDirection" placeholder="Indicate grainline direction on sketch, especially for stripes/plaids/napped fabrics"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>Notching System Preference</label>
-                    <div class="hint">Select your preferred notching method</div>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notchSlit" name="notchingSystem">
-                            <label for="notchSlit">Slit Notch (single cut)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notchV" name="notchingSystem">
-                            <label for="notchV">V Notch (triangular cut outward)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notchCastle" name="notchingSystem">
-                            <label for="notchCastle">Castle Notch (U-shaped/rectangular)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notchInverted" name="notchingSystem">
-                            <label for="notchInverted">Inverted V Notch (triangular cut inward)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="notchStandard" name="notchingSystem">
-                            <label for="notchStandard">No preference – pattern maker's standard</label>
-                        </div>
-                    </div>
-                    <div id="customNotchContainer" class="dynamic-option">
-                        <input type="text" id="customNotch" name="customNotch" placeholder="Describe custom notching requirements">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="patternLabels">Pattern Labels Required</label>
-                    <div class="hint">Information to include on pattern pieces</div>
-                    <textarea id="patternLabels" name="patternLabels" placeholder="e.g., piece name, size, cut quantity, fabric type, grainline, notches, drill holes"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="fileFormat" class="required">Final File Format Needed</label>
-                    <div class="hint">Select the format(s) you need for your pattern</div>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="formatPDF" name="fileFormat" value="PDF">
-                            <label for="formatPDF">.PDF (for printing)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="formatDXF" name="fileFormat" value="DXF">
-                            <label for="formatDXF">.DXF (for digital cutting)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="formatAI" name="fileFormat" value="AI">
-                            <label for="formatAI">.AI (Adobe Illustrator)</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="formatOther" name="fileFormat" value="other">
-                            <label for="formatOther">Other (specify)</label>
-                        </div>
-                    </div>
-                    <div id="customFormatContainer" class="dynamic-option">
-                        <input type="text" id="customFormat" name="customFormat" placeholder="Specify other file format requirements">
-                    </div>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="prev5">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" id="next5">
-                        Next: Final Details <i class="fas fa-arrow-right"></i>
-                    </button>
-                </div>
-            </section>
-            
-            <!-- Section 6: Special Notes & Final Checklist -->
-            <section class="form-section" id="section6">
-                <h2 class="section-title"><span class="number">6</span> Final Details & Checklist</h2>
-                
-                <div class="form-group">
-                    <label for="targetCustomer">Target Customer/Body Type</label>
-                    <div class="hint">Who will be wearing this garment?</div>
-                    <textarea id="targetCustomer" name="targetCustomer" placeholder="e.g., petite women, tall men, athletic build, full bust, maternity, plus size"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="fitAdjustments">Common Fit Adjustments</label>
-                    <div class="hint">Any standard fit modifications needed</div>
-                    <textarea id="fitAdjustments" name="fitAdjustments" placeholder="e.g., rounded back adjustment, forward shoulder, full bust adjustment, sway back, square shoulders"></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="otherNotes">Other Notes & Requirements</label>
-                    <div class="hint">Any critical tolerances, branding labels, or construction preferences</div>
-                    <textarea id="otherNotes" name="otherNotes" placeholder="e.g., ±¼\" tolerance on key seams, include logo placement, specific stitch types, thread color matching, etc."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="contactInfo" class="required">Contact Information</label>
-                    <div class="hint">How should we contact you about this pattern request?</div>
-                    <div class="inline-fields">
-                        <div class="inline-field">
-                            <label for="contactName">Name *</label>
-                            <input type="text" id="contactName" name="contactName" required>
-                        </div>
-                        <div class="inline-field">
-                            <label for="contactEmail">Email *</label>
-                            <input type="email" id="contactEmail" name="contactEmail" required>
-                        </div>
-                        <div class="inline-field">
-                            <label for="contactPhone">Phone</label>
-                            <input type="text" id="contactPhone" name="contactPhone">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="timeline" class="required">Project Timeline</label>
-                    <div class="hint">When do you need this pattern completed?</div>
-                    <input type="text" id="timeline" name="timeline" placeholder="e.g., Within 2 weeks, by [specific date], ASAP" required>
-                </div>
-                
-                <div class="checklist-section">
-                    <h2 class="checklist-title"><i class="fas fa-clipboard-check"></i> Final Submission Checklist</h2>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check1" name="finalChecklist">
-                        <label for="check1">All sketches/images attached and clearly labeled</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check2" name="finalChecklist">
-                        <label for="check2">All measurements and sizing details provided</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check3" name="finalChecklist">
-                        <label for="check3">Fabric information and stretch details confirmed</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check4" name="finalChecklist">
-                        <label for="check4">Construction and finishing details specified</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check5" name="finalChecklist">
-                        <label for="check5">Preferred output format selected</label>
-                    </div>
-                    
-                    <div class="checklist-item">
-                        <input type="checkbox" id="check6" name="finalChecklist">
-                        <label for="check6">Contact information and timeline included</label>
-                    </div>
-                </div>
-                
-                <div class="navigation-buttons">
-                    <button type="button" class="btn btn-secondary" id="prev6">
-                        <i class="fas fa-arrow-left"></i> Previous
-                    </button>
-                    <button type="button" class="btn btn-primary" id="previewForm">
-                        <i class="fas fa-eye"></i> Preview
-                    </button>
-                    <button type="submit" class="btn btn-success" id="submitForm">
-                        <i class="fas fa-paper-plane"></i> Submit
-                    </button>
-                </div>
-            </section>
-        </form>
-        
         <div class="footer">
             <p>Once completed, submit this form along with your sketches and any reference samples to your pattern maker.</p>
-            <p>For questions or assistance, contact: <a href="mailto:patterns@example.com">patterns@example.com</a></p>
-            <p style="margin-top: 20px; font-size: 0.9rem;">© 2023 Pattern Development Services. All rights reserved.</p>
+            <p>Need assistance? Contact: <a href="mailto:patterns@example.com">patterns@example.com</a></p>
         </div>
     </div>
 
     <script>
         // DOM elements
-        const form = document.getElementById('patternRequestForm');
-        const progressText = document.getElementById('progressText');
-        const sections = document.querySelectorAll('.form-section');
-        const stepCircles = document.querySelectorAll('.step-circle');
-        const stepLabels = document.querySelectorAll('.step-label');
-        
-        // File upload elements
-        const referenceUploadArea = document.getElementById('referenceUploadArea');
-        const referenceImages = document.getElementById('referenceImages');
-        const referenceFileList = document.getElementById('referenceFileList');
-        
-        const sizeChartUploadArea = document.getElementById('sizeChartUploadArea');
-        const sizeChartUpload = document.getElementById('sizeChartUpload');
-        const sizeChartFileList = document.getElementById('sizeChartFileList');
-        
-        // Dynamic option containers
-        const customGarmentContainer = document.getElementById('customGarmentContainer');
-        const sizeChartContainer = document.getElementById('sizeChartContainer');
-        const customNotchContainer = document.getElementById('customNotchContainer');
-        const customFormatContainer = document.getElementById('customFormatContainer');
-        
-        // Current section index
+        const sections = document.querySelectorAll('.form-section-content');
+        const progressSteps = document.querySelectorAll('.progress-step');
+        const progressStepCircles = document.querySelectorAll('.progress-step-circle');
+        const progressStepLabels = document.querySelectorAll('.progress-step-label');
         let currentSection = 0;
-        const totalSections = sections.length;
+        const totalSections = 6;
         
-        // Section titles for progress text
-        const sectionTitles = [
+        // Progress elements
+        const progressFill = document.getElementById('progressFill');
+        const progressStepText = document.getElementById('progressStep');
+        const progressStepName = document.getElementById('progressStepName');
+        
+        // Form elements
+        const form = {
+            garmentType: document.getElementById('garmentType'),
+            silhouetteFit: document.getElementById('silhouetteFit'),
+            designDetails: document.getElementById('designDetails'),
+            fabricType: document.getElementById('fabricType'),
+            fabricWeight: document.getElementById('fabricWeight'),
+            stretchPercentage: document.getElementById('stretchPercentage'),
+            stretchLengthwise: document.getElementById('stretchLengthwise'),
+            stretchCrosswise: document.getElementById('stretchCrosswise'),
+            stretchBoth: document.getElementById('stretchBoth'),
+            fabricNotes: document.getElementById('fabricNotes'),
+            baseSize: document.getElementById('baseSize'),
+            bustMeasure: document.getElementById('bustMeasure'),
+            waistMeasure: document.getElementById('waistMeasure'),
+            hipMeasure: document.getElementById('hipMeasure'),
+            lengthMeasure: document.getElementById('lengthMeasure'),
+            sleeveMeasure: document.getElementById('sleeveMeasure'),
+            otherMeasure: document.getElementById('otherMeasure'),
+            easeWovens: document.getElementById('easeWovens'),
+            easeKnits: document.getElementById('easeKnits'),
+            gradingYes: document.getElementById('gradingYes'),
+            gradingNo: document.getElementById('gradingNo'),
+            seamAllowance: document.getElementById('seamAllowance'),
+            hemStyle: document.getElementById('hemStyle'),
+            closures: document.getElementById('closures'),
+            liningFacing: document.getElementById('liningFacing'),
+            grainlineDirection: document.getElementById('grainlineDirection'),
+            notchSlit: document.getElementById('notchSlit'),
+            notchV: document.getElementById('notchV'),
+            notchCastle: document.getElementById('notchCastle'),
+            notchInverted: document.getElementById('notchInverted'),
+            notchCustom: document.getElementById('notchCustom'),
+            notchStandard: document.getElementById('notchStandard'),
+            customNotching: document.getElementById('customNotching'),
+            patternLabels: document.getElementById('patternLabels'),
+            formatPDF: document.getElementById('formatPDF'),
+            formatDXF: document.getElementById('formatDXF'),
+            formatAI: document.getElementById('formatAI'),
+            formatOther: document.getElementById('formatOther'),
+            otherFormat: document.getElementById('otherFormat'),
+            targetCustomer: document.getElementById('targetCustomer'),
+            fitAdjustments: document.getElementById('fitAdjustments'),
+            otherNotes: document.getElementById('otherNotes'),
+            contactInfo: document.getElementById('contactInfo'),
+            timeline: document.getElementById('timeline')
+        };
+        
+        // Step names for display
+        const stepNames = [
             "Design Overview",
             "Fabric Information", 
             "Sizing & Measurements",
             "Construction Details",
             "Technical Requirements",
-            "Final Details & Checklist"
+            "Special Notes & Review"
         ];
         
         // Initialize when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Setup file upload areas
-            setupFileUpload(referenceUploadArea, referenceImages, referenceFileList, 'reference');
-            setupFileUpload(sizeChartUploadArea, sizeChartUpload, sizeChartFileList, 'sizeChart');
-            
-            // Setup dynamic options
-            setupDynamicOptions();
+            // Setup file upload
+            setupFileUpload('referenceUploadArea', 'referenceImages', 'referenceFileList');
+            setupFileUpload('sizeChartUploadArea', 'sizeChart', 'sizeChartFileList');
             
             // Setup navigation
             setupNavigation();
             
-            // Setup form validation and submission
+            // Setup form handlers
             setupFormHandlers();
             
             // Update progress display
             updateProgressDisplay();
+            
+            // Setup real-time preview updates
+            setupRealTimePreview();
+            
+            // Set initial progress
+            updateProgress(0);
+            
+            // Focus first input for keyboard users
+            setTimeout(() => {
+                form.garmentType.focus();
+            }, 100);
         });
         
         // Setup file upload functionality
-        function setupFileUpload(uploadArea, fileInput, fileList, type) {
-            // Click on upload area to trigger file input
-            uploadArea.addEventListener('click', function() {
-                fileInput.click();
+        function setupFileUpload(uploadAreaId, fileInputId, fileListId) {
+            const uploadArea = document.getElementById(uploadAreaId);
+            const fileInput = document.getElementById(fileInputId);
+            const fileList = document.getElementById(fileListId);
+            
+            if (!uploadArea || !fileInput || !fileList) return;
+            
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    fileInput.click();
+                }
             });
             
-            // Handle file selection
             fileInput.addEventListener('change', function(e) {
-                handleFiles(e.target.files, fileList, type);
-                fileInput.value = ''; // Reset input
+                handleFiles(e.target.files, fileList);
+                fileInput.value = '';
             });
             
-            // Drag and drop functionality
-            uploadArea.addEventListener('dragover', function(e) {
+            uploadArea.addEventListener('dragover', (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#3498db';
                 uploadArea.style.backgroundColor = '#e8f4fc';
+                uploadArea.style.transform = 'translateY(-5px)';
             });
             
-            uploadArea.addEventListener('dragleave', function(e) {
+            uploadArea.addEventListener('dragleave', (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#bdc3c7';
                 uploadArea.style.backgroundColor = '#f9f9f9';
+                uploadArea.style.transform = 'translateY(0)';
             });
             
-            uploadArea.addEventListener('drop', function(e) {
+            uploadArea.addEventListener('drop', (e) => {
                 e.preventDefault();
                 uploadArea.style.borderColor = '#bdc3c7';
                 uploadArea.style.backgroundColor = '#f9f9f9';
-                
+                uploadArea.style.transform = 'translateY(0)';
                 if (e.dataTransfer.files.length) {
-                    handleFiles(e.dataTransfer.files, fileList, type);
+                    handleFiles(e.dataTransfer.files, fileList);
                 }
             });
         }
         
         // Handle uploaded files
-        function handleFiles(files, fileList, type) {
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
+        function handleFiles(files, fileList) {
+            for (let file of files) {
                 const listItem = document.createElement('li');
-                
-                // Truncate long file names
-                let displayName = file.name;
-                if (displayName.length > 35) {
-                    displayName = displayName.substring(0, 32) + '...';
-                }
+                let displayName = file.name.length > 30 ? file.name.substring(0, 27) + '...' : file.name;
                 
                 listItem.innerHTML = `
                     <span>${displayName} (${formatFileSize(file.size)})</span>
-                    <i class="fas fa-times" data-file="${file.name}"></i>
+                    <i class="fas fa-times" aria-label="Remove file"></i>
                 `;
                 
                 fileList.appendChild(listItem);
-                
-                // Add delete functionality
-                listItem.querySelector('i').addEventListener('click', function() {
-                    listItem.remove();
-                });
+                listItem.querySelector('i').addEventListener('click', () => listItem.remove());
             }
         }
         
-        // Format file size for display
+        // Format file size
         function formatFileSize(bytes) {
             if (bytes < 1024) return bytes + ' bytes';
             else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
             else return (bytes / 1048576).toFixed(1) + ' MB';
-        }
-        
-        // Setup dynamic form options
-        function setupDynamicOptions() {
-            // Garment type - show custom input if "Other" is selected
-            document.getElementById('garmentType').addEventListener('change', function() {
-                if (this.value === 'other') {
-                    customGarmentContainer.classList.add('active');
-                } else {
-                    customGarmentContainer.classList.remove('active');
-                }
-            });
-            
-            // Size grading - show upload area if "Yes" is selected
-            document.querySelectorAll('input[name="sizeGrading"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    if (this.value === 'yes') {
-                        sizeChartContainer.classList.add('active');
-                    } else {
-                        sizeChartContainer.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Notching system - show custom input if custom option is checked
-            document.querySelectorAll('input[name="notchingSystem"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.id === 'notchOther' && this.checked) {
-                        customNotchContainer.classList.add('active');
-                    } else if (this.id === 'notchOther') {
-                        customNotchContainer.classList.remove('active');
-                    }
-                });
-            });
-            
-            // File format - show custom input if "Other" is checked
-            document.querySelectorAll('input[name="fileFormat"]').forEach(checkbox => {
-                checkbox.addEventListener('change', function() {
-                    if (this.id === 'formatOther' && this.checked) {
-                        customFormatContainer.classList.add('active');
-                    } else if (this.id === 'formatOther') {
-                        customFormatContainer.classList.remove('active');
-                    }
-                });
-            });
         }
         
         // Setup navigation
@@ -1174,46 +1542,72 @@
             document.getElementById('prev5').addEventListener('click', () => navigateTo(3));
             document.getElementById('prev6').addEventListener('click', () => navigateTo(4));
             
-            // Progress step clicks
-            stepCircles.forEach((circle, index) => {
-                circle.addEventListener('click', () => {
-                    if (index <= currentSection || isSectionComplete(index)) {
-                        navigateTo(index);
-                    }
-                });
+            // Progress steps click
+            progressSteps.forEach((step, index) => {
+                step.addEventListener('click', () => navigateTo(index));
             });
         }
         
-        // Check if a section is complete
-        function isSectionComplete(sectionIndex) {
-            // For now, let users navigate to any previous section
-            // In a real app, you might validate each section before allowing navigation
-            return true;
-        }
-        
-        // Navigate to a specific section
+        // Navigate to section
         function navigateTo(sectionIndex) {
-            // Validate current section before leaving (basic validation)
-            if (!validateCurrentSection()) {
-                return;
-            }
+            // Validate current section
+            if (sectionIndex > currentSection && !validateCurrentSection()) return;
             
-            // Update current section
             currentSection = sectionIndex;
             
             // Hide all sections
-            sections.forEach(section => {
-                section.classList.remove('active');
-            });
+            sections.forEach(section => section.classList.remove('active'));
             
-            // Show the selected section
+            // Show selected section
             sections[sectionIndex].classList.add('active');
             
-            // Update progress display
-            updateProgressDisplay();
+            // Update progress
+            updateProgress(sectionIndex);
             
-            // Scroll to top of form
-            document.querySelector('.form-container').scrollTop = 0;
+            // Update progress steps
+            updateProgressSteps(sectionIndex);
+            
+            // Scroll to top
+            document.querySelector('.form-section').scrollTop = 0;
+            
+            // Focus first input in section for keyboard users
+            setTimeout(() => {
+                const firstInput = sections[sectionIndex].querySelector('input, select, textarea');
+                if (firstInput) firstInput.focus();
+            }, 100);
+        }
+        
+        // Update progress display
+        function updateProgress(currentStep) {
+            // Calculate percentage for progress bar
+            const percentage = (currentStep / (totalSections - 1)) * 100;
+            
+            // Update main progress bar
+            progressFill.style.width = percentage + '%';
+            
+            // Update step text
+            progressStepText.textContent = currentStep + 1;
+            progressStepName.textContent = stepNames[currentStep];
+            
+            // Update preview
+            document.getElementById('previewStep').textContent = stepNames[currentStep];
+            document.getElementById('previewProgress').textContent = (currentStep + 1) + ' of 6';
+        }
+        
+        // Update progress steps in header
+        function updateProgressSteps(currentIndex) {
+            progressStepCircles.forEach((circle, index) => {
+                circle.classList.remove('active', 'completed');
+                progressStepLabels[index].classList.remove('active', 'completed');
+                
+                if (index === currentIndex) {
+                    circle.classList.add('active');
+                    progressStepLabels[index].classList.add('active');
+                } else if (index < currentIndex) {
+                    circle.classList.add('completed');
+                    progressStepLabels[index].classList.add('completed');
+                }
+            });
         }
         
         // Validate current section
@@ -1222,112 +1616,151 @@
             const requiredInputs = currentSectionEl.querySelectorAll('[required]');
             
             for (let input of requiredInputs) {
-                if (input.type === 'checkbox' || input.type === 'radio') {
-                    // For checkboxes/radios in a group
-                    const name = input.name;
-                    const groupChecked = currentSectionEl.querySelector(`input[name="${name}"]:checked`);
-                    if (!groupChecked) {
-                        alert(`Please complete all required fields in the ${sectionTitles[currentSection]} section.`);
-                        input.focus();
-                        return false;
-                    }
-                } else if (input.type === 'file') {
-                    // For file inputs in section 1
-                    if (currentSection === 0) {
-                        const fileList = document.getElementById('referenceFileList');
-                        if (fileList.children.length === 0) {
-                            alert('Please upload at least one reference image or sketch.');
-                            return false;
-                        }
-                    }
-                } else {
-                    const value = input.value.trim();
-                    if (!value) {
-                        alert(`Please complete all required fields in the ${sectionTitles[currentSection]} section.`);
-                        input.focus();
-                        return false;
-                    }
+                if (!input.value.trim()) {
+                    alert(`Please complete all required fields in this section before continuing.`);
+                    input.focus();
+                    return false;
                 }
             }
             
             return true;
         }
         
-        // Update progress display
-        function updateProgressDisplay() {
-            // Update progress text
-            progressText.textContent = `Step ${currentSection + 1} of ${totalSections}: ${sectionTitles[currentSection]}`;
-            
-            // Update step circles and labels
-            stepCircles.forEach((circle, index) => {
-                circle.classList.remove('active', 'completed');
-                stepLabels[index].classList.remove('active');
-                
-                if (index === currentSection) {
-                    circle.classList.add('active');
-                    stepLabels[index].classList.add('active');
-                } else if (index < currentSection) {
-                    circle.classList.add('completed');
-                }
-            });
-        }
-        
         // Setup form handlers
         function setupFormHandlers() {
-            // Clear form button
+            // Clear form
             document.getElementById('clearForm').addEventListener('click', function() {
-                if (confirm('Are you sure you want to clear the entire form? All entered data will be lost.')) {
-                    form.reset();
+                if (confirm('Are you sure you want to clear all form fields?')) {
+                    // Reset all form elements
+                    Object.values(form).forEach(element => {
+                        if (element) {
+                            if (element.type === 'checkbox' || element.type === 'radio') {
+                                element.checked = false;
+                            } else {
+                                element.value = '';
+                            }
+                        }
+                    });
                     
                     // Clear file lists
-                    const fileLists = document.querySelectorAll('.file-list');
-                    fileLists.forEach(list => {
-                        list.innerHTML = '';
-                    });
+                    document.getElementById('referenceFileList').innerHTML = '';
+                    document.getElementById('sizeChartFileList').innerHTML = '';
                     
-                    // Hide dynamic options
-                    const dynamicContainers = document.querySelectorAll('.dynamic-option');
-                    dynamicContainers.forEach(container => {
-                        container.classList.remove('active');
-                    });
+                    // Clear checklist
+                    document.querySelectorAll('input[name="checklist"]').forEach(cb => cb.checked = false);
                     
                     // Go back to first section
                     navigateTo(0);
+                    
+                    // Reset preview
+                    updatePreview();
+                    
+                    alert('Form cleared successfully!');
                 }
             });
             
-            // Preview button
-            document.getElementById('previewForm').addEventListener('click', function() {
-                if (validateCurrentSection() && validateAllSections()) {
-                    generatePreview();
-                }
-            });
-            
-            // Form submission
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
+            // Submit form
+            document.getElementById('submitForm').addEventListener('click', function() {
+                // Validate checklist
+                const checklistItems = document.querySelectorAll('input[name="checklist"]');
+                let allChecked = true;
                 
-                if (validateCurrentSection() && validateAllSections()) {
-                    // Check if all checklist items are checked
-                    const allChecked = Array.from(document.querySelectorAll('input[name="finalChecklist"]'))
-                        .every(item => item.checked);
-                    
-                    if (!allChecked) {
-                        alert('Please check all items in the Final Submission Checklist before submitting.');
-                        document.getElementById('check1').focus();
-                        return;
-                    }
-                    
-                    // Generate and download PDF
+                checklistItems.forEach(item => {
+                    if (!item.checked) allChecked = false;
+                });
+                
+                if (!allChecked) {
+                    alert('Please check all items in the Final Submission Checklist before submitting.');
+                    return;
+                }
+                
+                if (validateAllSections()) {
+                    // Generate PDF
                     generatePDF();
                     
                     // Show success message
-                    alert('Pattern request submitted successfully! A copy has been downloaded as PDF.');
+                    alert('Pattern request submitted successfully! A PDF preview has been downloaded.');
                     
-                    // In a real application, you would send the form data to a server here
-                    console.log('Form data:', collectFormData());
+                    // In real app, submit to server
+                    console.log('Form submitted:', collectFormData());
                 }
             });
+            
+            // Update preview button
+            document.getElementById('updatePreview').addEventListener('click', updatePreview);
+            
+            // Download PDF button
+            document.getElementById('downloadPDF').addEventListener('click', generatePDF);
+            
+            // Show/hide custom notching field
+            document.getElementById('notchCustom').addEventListener('change', function() {
+                document.getElementById('customNotching').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Show/hide other format field
+            document.getElementById('formatOther').addEventListener('change', function() {
+                document.getElementById('otherFormat').style.display = this.checked ? 'block' : 'none';
+            });
+            
+            // Initially hide these fields
+            document.getElementById('customNotching').style.display = 'none';
+            document.getElementById('otherFormat').style.display = 'none';
+        }
+        
+        // Setup real-time preview updates
+        function setupRealTimePreview() {
+            // Add input event listeners to all form fields
+            Object.values(form).forEach(element => {
+                if (element && element.addEventListener) {
+                    if (element.type === 'checkbox' || element.type === 'radio') {
+                        element.addEventListener('change', updatePreview);
+                    } else {
+                        element.addEventListener('input', updatePreview);
+                    }
+                }
+            });
+            
+            // Also update on file changes
+            document.getElementById('referenceFileList').addEventListener('DOMNodeInserted', updatePreview);
+            document.getElementById('referenceFileList').addEventListener('DOMNodeRemoved', updatePreview);
+            document.getElementById('sizeChartFileList').addEventListener('DOMNodeInserted', updatePreview);
+            document.getElementById('sizeChartFileList').addEventListener('DOMNodeRemoved', updatePreview);
+            
+            // Update on checklist changes
+            document.querySelectorAll('input[name="checklist"]').forEach(cb => {
+                cb.addEventListener('change', updatePreview);
+            });
+        }
+        
+        // Update preview
+        function updatePreview() {
+            const data = collectFormData();
+            
+            // Update preview elements
+            document.getElementById('previewGarment').textContent = data.garmentType || 'Not specified';
+            document.getElementById('previewFit').textContent = data.silhouetteFit || 'Not specified';
+            document.getElementById('previewDesign').textContent = data.designDetails || 'Not specified';
+            document.getElementById('previewFabric').textContent = data.fabricType || 'Not specified';
+            document.getElementById('previewWeight').textContent = data.fabricWeight || 'Not specified';
+            
+            let stretchText = '';
+            if (data.stretchPercentage) stretchText += data.stretchPercentage + '% ';
+            if (data.stretchDirection && data.stretchDirection.length > 0) {
+                stretchText += '(' + data.stretchDirection.join(', ') + ')';
+            }
+            document.getElementById('previewStretch').textContent = stretchText || 'Not specified';
+            
+            document.getElementById('previewSize').textContent = data.baseSize || 'Not specified';
+            document.getElementById('previewBust').textContent = data.bustMeasure || 'Not specified';
+            document.getElementById('previewWaist').textContent = data.waistMeasure || 'Not specified';
+            document.getElementById('previewHip').textContent = data.hipMeasure || 'Not specified';
+            document.getElementById('previewSeam').textContent = data.seamAllowance || 'Not specified';
+            document.getElementById('previewHem').textContent = data.hemStyle || 'Not specified';
+            document.getElementById('previewClosures').textContent = data.closures || 'Not specified';
+            document.getElementById('previewFormats').textContent = data.fileFormats || 'Not specified';
+            document.getElementById('previewNotching').textContent = data.notchingSystem || 'Not specified';
+            document.getElementById('previewTarget').textContent = data.targetCustomer || 'Not specified';
+            document.getElementById('previewAdjustments').textContent = data.fitAdjustments || 'Not specified';
         }
         
         // Validate all sections
@@ -1337,29 +1770,11 @@
                 const requiredInputs = section.querySelectorAll('[required]');
                 
                 for (let input of requiredInputs) {
-                    if (input.type === 'checkbox' || input.type === 'radio') {
-                        const name = input.name;
-                        const groupChecked = section.querySelector(`input[name="${name}"]:checked`);
-                        if (!groupChecked) {
-                            alert(`Please complete all required fields in the ${sectionTitles[i]} section.`);
-                            navigateTo(i);
-                            return false;
-                        }
-                    } else if (input.type === 'file' && i === 0) {
-                        const fileList = document.getElementById('referenceFileList');
-                        if (fileList.children.length === 0) {
-                            alert('Please upload at least one reference image or sketch in the Design Overview section.');
-                            navigateTo(0);
-                            return false;
-                        }
-                    } else {
-                        const value = input.value.trim();
-                        if (!value) {
-                            alert(`Please complete all required fields in the ${sectionTitles[i]} section.`);
-                            navigateTo(i);
-                            input.focus();
-                            return false;
-                        }
+                    if (!input.value.trim()) {
+                        alert(`Please complete all required fields in section ${i + 1} before submitting.`);
+                        navigateTo(i);
+                        input.focus();
+                        return false;
                     }
                 }
             }
@@ -1369,198 +1784,167 @@
         
         // Collect form data
         function collectFormData() {
-            const formData = new FormData(form);
             const data = {};
             
             // Get values from form elements
-            formData.forEach((value, key) => {
-                data[key] = value;
-            });
-            
-            // Get checkbox and radio values
-            const checkboxes = form.querySelectorAll('input[type="checkbox"]:checked');
-            checkboxes.forEach(checkbox => {
-                if (!data[checkbox.name]) data[checkbox.name] = [];
-                data[checkbox.name].push(checkbox.value);
-            });
-            
-            // Get file information
-            const fileLists = {
-                'referenceImages': document.getElementById('referenceFileList'),
-                'sizeChart': document.getElementById('sizeChartFileList')
-            };
-            
-            for (const [key, list] of Object.entries(fileLists)) {
-                data[key + 'Files'] = [];
-                list.querySelectorAll('li').forEach(item => {
-                    data[key + 'Files'].push(item.querySelector('span').textContent);
-                });
+            for (const [key, element] of Object.entries(form)) {
+                if (element) {
+                    if (element.type === 'checkbox' || element.type === 'radio') {
+                        if (element.checked) {
+                            if (key.startsWith('stretch')) {
+                                if (!data.stretchDirection) data.stretchDirection = [];
+                                data.stretchDirection.push(element.value);
+                            } else if (key.startsWith('notch')) {
+                                data.notchingSystem = element.value;
+                            } else if (key.startsWith('format')) {
+                                if (!data.fileFormats) data.fileFormats = [];
+                                data.fileFormats.push(element.value);
+                            } else if (key === 'gradingYes' || key === 'gradingNo') {
+                                data.sizeGrading = element.value;
+                            } else {
+                                data[key] = element.value;
+                            }
+                        }
+                    } else {
+                        data[key] = element.value.trim();
+                    }
+                }
             }
             
-            // Add timestamp
-            data.timestamp = new Date().toISOString();
+            // Get file counts
+            const referenceFileList = document.getElementById('referenceFileList');
+            const sizeChartFileList = document.getElementById('sizeChartFileList');
+            data.referenceFileCount = referenceFileList.children.length;
+            data.sizeChartFileCount = sizeChartFileList.children.length;
+            
+            // Get checklist status
+            const checklistItems = document.querySelectorAll('input[name="checklist"]');
+            data.checklistCompleted = Array.from(checklistItems).every(item => item.checked);
+            
+            // Format file formats as string
+            if (data.fileFormats && data.fileFormats.length > 0) {
+                data.fileFormats = data.fileFormats.join(', ');
+            }
+            
+            // Format stretch direction as string
+            if (data.stretchDirection && data.stretchDirection.length > 0) {
+                data.stretchDirection = data.stretchDirection.join(', ');
+            }
             
             return data;
-        }
-        
-        // Generate preview
-        function generatePreview() {
-            const data = collectFormData();
-            
-            let previewHTML = `
-                <div style="padding: 20px; font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto;">
-                    <h1 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Pattern Request Preview</h1>
-                    <p style="color: #7f8c8d; font-style: italic;">Generated on ${new Date().toLocaleDateString()}</p>
-                    
-                    <div style="margin-top: 30px;">
-                        <h2 style="color: #2c3e50; background-color: #ecf0f1; padding: 10px; border-radius: 5px;">1. Design Overview</h2>
-                        <p><strong>Garment Type:</strong> ${data.garmentType || 'Not specified'}</p>
-                        <p><strong>Silhouette & Fit:</strong> ${data.silhouetteFit || 'Not specified'}</p>
-                        <p><strong>Design Details:</strong> ${data.designDetails || 'Not specified'}</p>
-                        <p><strong>Reference Images:</strong> ${data.referenceImagesFiles ? data.referenceImagesFiles.length + ' file(s) attached' : 'No files attached'}</p>
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <h2 style="color: #2c3e50; background-color: #ecf0f1; padding: 10px; border-radius: 5px;">2. Fabric Information</h2>
-                        <p><strong>Fabric Type:</strong> ${data.fabricType || 'Not specified'}</p>
-                        <p><strong>Weight & Hand Feel:</strong> ${data.fabricWeight || 'Not specified'}</p>
-                        <p><strong>Stretch Percentage:</strong> ${data.fabricStretch || '0'}%</p>
-                        <p><strong>Special Notes:</strong> ${data.fabricNotes || 'None'}</p>
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <h2 style="color: #2c3e50; background-color: #ecf0f1; padding: 10px; border-radius: 5px;">3. Sizing & Measurements</h2>
-                        <p><strong>Base Size:</strong> ${data.baseSize || 'Not specified'}</p>
-                        <p><strong>Garment Measurements:</strong> ${data.garmentMeasurements || 'Not specified'}</p>
-                        <p><strong>Ease Requirements:</strong> Wovens: ${data.easeWovens || 'Not specified'}, Knits: ${data.easeKnits || 'Not specified'}</p>
-                        <p><strong>Size Grading:</strong> ${data.sizeGrading === 'yes' ? 'Yes, with size chart' : 'Single size only'}</p>
-                    </div>
-                    
-                    <div style="margin-top: 30px;">
-                        <h2 style="color: #2c3e50; background-color: #ecf0f1; padding: 10px; border-radius: 5px;">Contact & Timeline</h2>
-                        <p><strong>Contact:</strong> ${data.contactName} (${data.contactEmail})</p>
-                        <p><strong>Timeline:</strong> ${data.timeline}</p>
-                    </div>
-                    
-                    <div style="margin-top: 40px; padding: 20px; background-color: #f8f9fa; border-radius: 8px; border-left: 5px solid #27ae60;">
-                        <p style="color: #27ae60; font-weight: bold;">This is a preview of your pattern request.</p>
-                        <p>Submit the form to generate a complete PDF with all details and file attachments.</p>
-                    </div>
-                </div>
-            `;
-            
-            // Open preview in new window
-            const previewWindow = window.open();
-            previewWindow.document.write(previewHTML);
-            previewWindow.document.close();
         }
         
         // Generate PDF
         function generatePDF() {
             const data = collectFormData();
+            const date = new Date().toLocaleDateString();
             
-            // Create a temporary element for PDF generation
-            const pdfContent = document.createElement('div');
-            pdfContent.style.padding = '20px';
-            pdfContent.style.backgroundColor = 'white';
-            pdfContent.style.color = 'black';
-            pdfContent.style.width = '800px';
-            pdfContent.style.fontFamily = 'Arial, sans-serif';
-            
-            pdfContent.innerHTML = `
-                <div style="text-align: center; margin-bottom: 30px; border-bottom: 3px solid #2c3e50; padding-bottom: 20px;">
-                    <h1 style="color: #2c3e50; font-size: 28px; margin-bottom: 10px;">Interactive Pattern Ready Checklist</h1>
-                    <h2 style="color: #7f8c8d; font-size: 18px; font-weight: normal;">Submitted on ${new Date().toLocaleDateString()}</h2>
-                </div>
+            // Create PDF content
+            const pdfContent = `
+                UNIVERSAL PATTERN DEVELOPMENT REQUEST FORM
+                ===========================================
+                Submitted: ${date}
                 
-                <div style="margin-bottom: 30px;">
-                    <h3 style="color: #2c3e50; background-color: #ecf0f1; padding: 12px; border-radius: 5px; font-size: 20px;">1. Design Overview</h3>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; width: 200px;">Garment Type:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.garmentType || 'Not specified'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Silhouette & Fit:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.silhouetteFit || 'Not specified'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; vertical-align: top;">Design Details:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.designDetails || 'Not specified'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Reference Images:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.referenceImagesFiles ? data.referenceImagesFiles.length + ' file(s) attached' : 'No files attached'}</td>
-                        </tr>
-                    </table>
-                </div>
+                1. DESIGN OVERVIEW
+                ------------------
+                Garment Type: ${data.garmentType || 'Not specified'}
+                Silhouette & Fit: ${data.silhouetteFit || 'Not specified'}
+                Design Details: ${data.designDetails || 'Not specified'}
+                Reference Images: ${data.referenceFileCount || 0} file(s) attached
                 
-                <div style="margin-bottom: 30px;">
-                    <h3 style="color: #2c3e50; background-color: #ecf0f1; padding: 12px; border-radius: 5px; font-size: 20px;">2. Fabric Information</h3>
-                    <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; width: 200px;">Fabric Type:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.fabricType || 'Not specified'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Weight & Hand Feel:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.fabricWeight || 'Not specified'}</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold;">Stretch Percentage:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.fabricStretch || '0'}%</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd; font-weight: bold; vertical-align: top;">Special Notes:</td>
-                            <td style="padding: 8px; border-bottom: 1px solid #ddd;">${data.fabricNotes || 'None'}</td>
-                        </tr>
-                    </table>
-                </div>
+                2. FABRIC INFORMATION
+                ---------------------
+                Fabric Type: ${data.fabricType || 'Not specified'}
+                Weight & Hand Feel: ${data.fabricWeight || 'Not specified'}
+                Stretch Percentage: ${data.stretchPercentage || '0'}%
+                Stretch Direction: ${data.stretchDirection || 'Not specified'}
+                Special Notes: ${data.fabricNotes || 'None'}
                 
-                <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #ecf0f1;">
-                    <p style="font-size: 14px; color: #7f8c8d;">Interactive Pattern Ready Checklist Form</p>
-                    <p style="font-size: 12px; color: #95a5a6;">Submitted electronically on ${new Date().toLocaleString()}</p>
-                </div>
+                3. SIZING & MEASUREMENTS
+                -------------------------
+                Base Size: ${data.baseSize || 'Not specified'}
+                Bust: ${data.bustMeasure || 'Not specified'}
+                Waist: ${data.waistMeasure || 'Not specified'}
+                Hip: ${data.hipMeasure || 'Not specified'}
+                Length: ${data.lengthMeasure || 'Not specified'}
+                Sleeve: ${data.sleeveMeasure || 'Not specified'}
+                Other: ${data.otherMeasure || 'Not specified'}
+                Ease (Wovens): ${data.easeWovens || 'Not specified'}
+                Ease (Knits): ${data.easeKnits || 'Not specified'}
+                Size Grading: ${data.sizeGrading === 'yes' ? 'Yes - size chart attached' : 'No - single size only'}
+                Size Chart Files: ${data.sizeChartFileCount || 0} file(s) attached
+                
+                4. CONSTRUCTION DETAILS
+                -----------------------
+                Seam Allowance: ${data.seamAllowance || 'Not specified'}
+                Hem Style & Width: ${data.hemStyle || 'Not specified'}
+                Closures: ${data.closures || 'Not specified'}
+                Lining/Facing/Interfacing: ${data.liningFacing || 'Not specified'}
+                
+                5. TECHNICAL REQUIREMENTS
+                --------------------------
+                Grainline Direction: ${data.grainlineDirection || 'Not specified'}
+                Notching System: ${data.notchingSystem || 'Pattern maker\'s standard'}
+                Custom Notching: ${data.customNotching || 'N/A'}
+                Pattern Labels Required: ${data.patternLabels || 'Not specified'}
+                Final File Format Needed: ${data.fileFormats || 'Not specified'}
+                Other Format: ${data.otherFormat || 'N/A'}
+                
+                6. SPECIAL NOTES & FIT CONSIDERATIONS
+                --------------------------------------
+                Target Customer/Body Type: ${data.targetCustomer || 'Not specified'}
+                Common Fit Adjustments: ${data.fitAdjustments || 'Not specified'}
+                Other Notes: ${data.otherNotes || 'None'}
+                
+                CONTACT & TIMELINE
+                ------------------
+                Contact Information: ${data.contactInfo || 'Not specified'}
+                Project Timeline: ${data.timeline || 'Not specified'}
+                
+                FINAL SUBMISSION CHECKLIST
+                --------------------------
+                Checklist Complete: ${data.checklistCompleted ? 'YES' : 'NO'}
+                
+                ===========================================
+                Generated: ${new Date().toLocaleString()}
+                Form ID: PAT-${Date.now().toString().slice(-6)}
             `;
             
-            // Use html2canvas and jsPDF to generate PDF
-            // Note: html2canvas is included via CDN in the head
-            // In a real implementation, you would use the html2canvas library
-            // For this example, we'll simulate the PDF generation
-            
-            // Generate filename based on garment type and date
-            const garmentType = data.garmentType || 'pattern';
-            const filename = `PatternReadyChecklist_${garmentType.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
-            
-            // Simulate PDF download (in a real app, you would use jsPDF)
-            alert(`PDF would be downloaded as: ${filename}\n\nIn a real implementation, the PDF would be generated with all form data.`);
-            
-            // Uncomment the following code when html2canvas is available:
-            /*
-            html2canvas(pdfContent).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jspdf.jsPDF('p', 'mm', 'a4');
-                const imgWidth = 210;
-                const pageHeight = 297;
-                const imgHeight = canvas.height * imgWidth / canvas.width;
-                let heightLeft = imgHeight;
-                let position = 0;
-                
-                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-                
-                // Add additional pages if needed
-                while (heightLeft >= 0) {
-                    position = heightLeft - imgHeight;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-                    heightLeft -= pageHeight;
-                }
-                
-                pdf.save(filename);
-            });
-            */
+            // Create downloadable file
+            const blob = new Blob([pdfContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `PatternRequest_${date.replace(/\//g, '-')}_${Date.now().toString().slice(-4)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Tab navigation between sections with Ctrl+Arrow keys
+            if (e.ctrlKey) {
+                if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    if (currentSection < totalSections - 1) {
+                        navigateTo(currentSection + 1);
+                    }
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    if (currentSection > 0) {
+                        navigateTo(currentSection - 1);
+                    }
+                }
+            }
+            
+            // Submit with Ctrl+Enter
+            if (e.ctrlKey && e.key === 'Enter') {
+                e.preventDefault();
+                document.getElementById('submitForm').click();
+            }
+        });
     </script>
 </body>
 </html>
